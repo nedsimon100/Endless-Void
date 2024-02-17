@@ -5687,8 +5687,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   TM: {fileID: 617420279}
   Wall: {fileID: 11400000, guid: 17ffbc8537740c644b1f840e1d377169, type: 2}
-  width: 200
-  height: 200
+  width: 80
+  height: 80
+  startDepth: -50
   scale: 0.15
   WallNoise: 0.55
   offsetX: 100

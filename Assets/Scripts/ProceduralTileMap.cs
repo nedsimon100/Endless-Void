@@ -10,7 +10,7 @@ public class ProceduralTileMap : MonoBehaviour
 
     public int width = 200;
     public int height = 200;
-
+    public int startDepth = -50;
     public float scale = 0.5f;
 
     public float WallNoise = 0.6f;
@@ -30,14 +30,22 @@ public class ProceduralTileMap : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        
     }
 
     IEnumerator NewBuildDelay()
     {
         while (true)
         {
-            this.transform.position = new Vector3Int(Mathf.FloorToInt(Player.transform.position.x - 50f), Mathf.FloorToInt(Player.transform.position.y - 50f), 0);
+            if (Player.transform.position.y < startDepth - (height/2))
+            {
+                this.transform.position = new Vector3Int(Mathf.FloorToInt(Player.transform.position.x - (width * 0.8659766f) / 2), Mathf.FloorToInt(Player.transform.position.y - height / 2), 0);
+            }
+            else
+            {
+                this.transform.position = new Vector3Int(Mathf.FloorToInt(Player.transform.position.x - (width * 0.8659766f) / 2), Mathf.FloorToInt(startDepth - (height)), 0);
+            }
+            
             BuildMap();
             yield return new WaitForSeconds(5f);
         }
@@ -74,8 +82,8 @@ public class ProceduralTileMap : MonoBehaviour
 
     public bool placeWall(int x,int y)
     {
-        float xPos = (this.transform.position.x + x) * scale + offsetX;
-        float yPos = (this.transform.position.y + y) * scale + offsetY;
+        float xPos = Mathf.Floor(this.transform.position.x + (x* 0.8659766f)) * scale + offsetX;
+        float yPos = Mathf.Floor(this.transform.position.y + y) * scale + offsetY;
 
         if (Mathf.PerlinNoise(xPos, yPos) > WallNoise)
         {
