@@ -30,14 +30,14 @@ public class ProceduralTileMap : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     IEnumerator NewBuildDelay()
     {
         while (true)
         {
-            this.transform.position = new Vector3Int(Mathf.FloorToInt(Player.transform.position.x - (width / 4)), Mathf.FloorToInt(Player.transform.position.y - (height / 5)), 0);
+            this.transform.position = new Vector3Int(Mathf.FloorToInt(Player.transform.position.x - 50f), Mathf.FloorToInt(Player.transform.position.y - 50f), 0);
             BuildMap();
             yield return new WaitForSeconds(5f);
         }
@@ -52,11 +52,21 @@ public class ProceduralTileMap : MonoBehaviour
             {
                 if (placeWall(x, y))
                 {
-                    TM.SetTile(new Vector3Int(Mathf.FloorToInt(this.transform.position.x+x),Mathf.FloorToInt(this.transform.position.y+y),0), Wall);
+                    float cellWorldX = (this.transform.position.x + x);
+                    float cellWorldY = (this.transform.position.y + y);
+
+                    // Set tile using world position of the cell
+                    Vector3Int tilePosition = TM.WorldToCell(new Vector3(cellWorldX, cellWorldY, 0));
+                    TM.SetTile(tilePosition, Wall);
                 }
                 else
                 {
-                    TM.SetTile(new Vector3Int(Mathf.FloorToInt(this.transform.position.x + x), Mathf.FloorToInt(this.transform.position.y + y), 0), null);
+                    float cellWorldX = (this.transform.position.x + x);
+                    float cellWorldY = (this.transform.position.y + y);
+
+                    // Set tile using world position of the cell
+                    Vector3Int tilePosition = TM.WorldToCell(new Vector3(cellWorldX, cellWorldY, 0));
+                    TM.SetTile(tilePosition, null);
                 }
             }
         }
@@ -64,8 +74,8 @@ public class ProceduralTileMap : MonoBehaviour
 
     public bool placeWall(int x,int y)
     {
-       float  xPos = x*scale+ Mathf.FloorToInt( this.transform.position.x)+offsetX;
-       float yPos = y*scale+Mathf.FloorToInt(this.transform.position.y)+offsetY;
+        float xPos = (this.transform.position.x + x) * scale + offsetX;
+        float yPos = (this.transform.position.y + y) * scale + offsetY;
 
         if (Mathf.PerlinNoise(xPos, yPos) > WallNoise)
         {
