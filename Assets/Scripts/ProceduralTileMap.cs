@@ -58,10 +58,12 @@ public class ProceduralTileMap : MonoBehaviour
         {
             for(int y = 0; y < height; y++)
             {
+                float cellWorldX = (this.transform.position.x + x * 0.8659766f);
+                float cellWorldY = (this.transform.position.y + y);
+
                 if (placeWall(x, y))
                 {
-                    float cellWorldX = (this.transform.position.x + x);
-                    float cellWorldY = (this.transform.position.y + y);
+
 
                     // Set tile using world position of the cell
                     Vector3Int tilePosition = TM.WorldToCell(new Vector3(cellWorldX, cellWorldY, 0));
@@ -69,8 +71,7 @@ public class ProceduralTileMap : MonoBehaviour
                 }
                 else
                 {
-                    float cellWorldX = (this.transform.position.x + x);
-                    float cellWorldY = (this.transform.position.y + y);
+
 
                     // Set tile using world position of the cell
                     Vector3Int tilePosition = TM.WorldToCell(new Vector3(cellWorldX, cellWorldY, 0));
