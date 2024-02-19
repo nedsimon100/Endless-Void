@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using TMPro;
 public class PlayerController : MonoBehaviour
 {
     private Vector2 moveDirection;
@@ -11,11 +11,17 @@ public class PlayerController : MonoBehaviour
     public float decelerationMult = 0.9f;
     private Rigidbody2D rb;
     public float accelerationMult = 0.3f;
+    public GameObject damageDisplay;
+    public float damagePercent;
+    public GameObject damageParticles;
+    public TextMeshProUGUI xPos;
+    public TextMeshProUGUI yPos;
     void Start()
     {
         rb = this.GetComponent<Rigidbody2D>();
         sonar.SetActive(false);
         StartCoroutine(SonarBurst());
+        StartCoroutine(healDamage());
     }
 
     IEnumerator SonarBurst()
@@ -35,6 +41,21 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         GetInputs();
+        checkDamage();
+        updateHud();
+    }
+    public void updateHud()
+    {
+        xPos.text = "X: " + Mathf.FloorToInt(this.transform.position.x).ToString();
+        yPos.text = "Y: " + Mathf.FloorToInt(this.transform.position.y).ToString();
+    }
+    public void checkDamage()
+    {
+        damageDisplay.GetComponent<SpriteRenderer>().color = new Color(0, 0, 0, damagePercent * 2);
+        if (damagePercent > 100)
+        {
+            //gameOver
+        }
     }
     private void FixedUpdate()
     {
@@ -53,5 +74,26 @@ public class PlayerController : MonoBehaviour
     {
         moveDirection = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
         moveDirection = moveDirection.normalized;
+    }
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        damagePercent += rb.velocity.magnitude * 5;
+        damageParticles.SetActive(false);
+        damageParticles.SetActive(true);
+    }
+    IEnumerator healDamage()
+    {
+
+        while (true)
+        {
+            if (damagePercent > 0)
+            {
+                damagePercent--;
+                yield return new WaitForSeconds(0.1f);
+            }
+            yield return null;
+        }
+
+       
     }
 }

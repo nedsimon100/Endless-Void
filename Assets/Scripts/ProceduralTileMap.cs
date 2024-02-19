@@ -8,6 +8,8 @@ public class ProceduralTileMap : MonoBehaviour
     public Tilemap TM;
     public Tile Wall;
 
+    public List<Vector3> enemySpawnPoints = new List<Vector3>();
+
     public int width = 200;
     public int height = 200;
     public int startDepth = -50;
@@ -53,46 +55,56 @@ public class ProceduralTileMap : MonoBehaviour
 
     public void BuildMap()
     {
+        enemySpawnPoints.Clear();
         TM.size = new Vector3Int(width,height,0);
         for(int x = 0; x < width; x++)
         {
             for(int y = 0; y < height; y++)
             {
-                float cellWorldX = (this.transform.position.x + x * 0.8659766f);
-                float cellWorldY = (this.transform.position.y + y);
+                //float cellWorldX = (this.transform.position.x + x * 0.8659766f);
+                //float cellWorldY = (this.transform.position.y + y);
 
-                if (placeWall(x, y))
-                {
-
-
-                    // Set tile using world position of the cell
-                    Vector3Int tilePosition = TM.WorldToCell(new Vector3(cellWorldX, cellWorldY, 0));
-                    TM.SetTile(tilePosition, Wall);
-                }
-                else
-                {
-
-
-                    // Set tile using world position of the cell
-                    Vector3Int tilePosition = TM.WorldToCell(new Vector3(cellWorldX, cellWorldY, 0));
-                    TM.SetTile(tilePosition, null);
-                }
+                placeWall(x, y);
             }
         }
     }
 
-    public bool placeWall(int x,int y)
+    public void placeWall(int x,int y)
     {
-        float xPos = Mathf.Floor(this.transform.position.x + (x* 0.8659766f)) * scale + offsetX;
-        float yPos = Mathf.Floor(this.transform.position.y + y) * scale + offsetY;
+        float xPos = (TM.CellToWorld(new Vector3Int(x, y, 0)).x) * scale + offsetX;
+        float yPos = (TM.CellToWorld(new Vector3Int(x, y, 0)).y) * scale + offsetY;
 
+        Vector3Int tilePosition = new Vector3Int(x, y, 0);
         if (Mathf.PerlinNoise(xPos, yPos) > WallNoise)
         {
-            return true;
+            
+            TM.SetTile(tilePosition, Wall);
         }
         else
         {
-            return false;
+            
+            TM.SetTile(tilePosition, null);
         }
+        if(Mathf.PerlinNoise(xPos, yPos) < 0.1f&& (TM.CellToWorld(new Vector3Int(x, y, 0)) - Player.transform.position).magnitude>15)
+        {
+            enemySpawnPoints.Add(new Vector3((TM.CellToWorld(new Vector3Int(x, y, 0)).x), (TM.CellToWorld(new Vector3Int(x, y, 0)).y), 0));
+        }
+    }
+    public int[] countPlayerScore(List<Vector3Int> placedTiles)
+    {
+        int[] playerCounts = new int[2];
+        playerCounts[0] = 0;
+
+        foreach(Vector3Int pt in placedTiles)
+        {
+            playerCounts[0]++;
+
+            if(Mathf.PerlinNoise(pt.x*scale+offsetX, pt.y * scale + offsetY) > WallNoise)
+            {
+                playerCounts[1]++;
+            }
+
+        }
+        return playerCounts;
     }
 }
