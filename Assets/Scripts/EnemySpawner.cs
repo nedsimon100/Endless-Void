@@ -18,8 +18,15 @@ public class EnemySpawner : MonoBehaviour
     {
         while (true)
         {
-            Instantiate(enemyPrefabs[Random.Range(0, enemyPrefabs.Count)], enemySpawnPoints[Random.Range(0, enemySpawnPoints.Count)], Quaternion.identity);
-            yield return new WaitForSeconds(3000/Mathf.Abs(player.transform.position.y));
+            if (player.transform.position.y < -60)
+            {
+                Instantiate(enemyPrefabs[Random.Range(0, enemyPrefabs.Count - 1)], enemySpawnPoints[Random.Range(0, enemySpawnPoints.Count - 1)], Quaternion.identity);
+                yield return new WaitForSeconds(500 / (Mathf.Abs(player.transform.position.y)+20));
+            }
+            else
+            {
+                yield return null;
+            }
         }
     }
     // Update is called once per frame

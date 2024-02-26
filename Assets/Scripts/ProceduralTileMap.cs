@@ -85,17 +85,17 @@ public class ProceduralTileMap : MonoBehaviour
             
             TM.SetTile(tilePosition, null);
         }
-        if(Mathf.PerlinNoise(xPos, yPos) < 0.1f&& (TM.CellToWorld(new Vector3Int(x, y, 0)) - Player.transform.position).magnitude>15)
+        if(Mathf.PerlinNoise(xPos, yPos) < 0.1f&& (TM.CellToWorld(new Vector3Int(x, y, 0)) - Player.transform.position).magnitude>10 && (TM.CellToWorld(new Vector3Int(x, y, 0)) - Player.transform.position).magnitude < 30)
         {
-            enemySpawnPoints.Add(new Vector3((TM.CellToWorld(new Vector3Int(x, y, 0)).x), (TM.CellToWorld(new Vector3Int(x, y, 0)).y), 0));
+            enemySpawnPoints.Add(TM.CellToWorld(new Vector3Int(x, y, 0)));
         }
     }
-    public int[] countPlayerScore(List<Vector3Int> placedTiles)
+    public int[] countPlayerScore(List<Vector3> placedTiles)
     {
         int[] playerCounts = new int[2];
-        playerCounts[0] = 0;
-
-        foreach(Vector3Int pt in placedTiles)
+        playerCounts[0] = 0; // all placed tiles
+        playerCounts[1] = 0; // correctly placed tiles
+        foreach(Vector3 pt in placedTiles)
         {
             playerCounts[0]++;
 

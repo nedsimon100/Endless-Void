@@ -16,8 +16,20 @@ public class PlayerController : MonoBehaviour
     public GameObject damageParticles;
     public TextMeshProUGUI xPos;
     public TextMeshProUGUI yPos;
+    public GameObject deadScreen;
+    public float MaxDepth;
+    private DrawMap dm;
+    private ProceduralTileMap ptm;
+    public TextMeshProUGUI mappedCellscnt;
+    public TextMeshProUGUI accuracycnt;
+    public TextMeshProUGUI depthcnt;
+    public GameObject startScreen;
     void Start()
     {
+        Time.timeScale = 0;
+        startScreen.SetActive(true);
+        ptm = FindObjectOfType<ProceduralTileMap>();
+        dm = FindObjectOfType<DrawMap>();
         rb = this.GetComponent<Rigidbody2D>();
         sonar.SetActive(false);
         StartCoroutine(SonarBurst());
@@ -30,6 +42,8 @@ public class PlayerController : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
+                Time.timeScale = 1;
+                startScreen.SetActive(false);
                 sonar.SetActive(true);
                 yield return new WaitForSeconds(5);
                 sonar.SetActive(false);
@@ -40,8 +54,11 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (Mathf.Abs(this.transform.position.y) > MaxDepth)
+        {
+            MaxDepth = Mathf.Abs(this.transform.position.y);
+        }
         GetInputs();
-        checkDamage();
         updateHud();
     }
     public void updateHud()
@@ -49,13 +66,14 @@ public class PlayerController : MonoBehaviour
         xPos.text = "X: " + Mathf.FloorToInt(this.transform.position.x).ToString();
         yPos.text = "Y: " + Mathf.FloorToInt(this.transform.position.y).ToString();
     }
-    public void checkDamage()
+    public void GameOver()
     {
-        damageDisplay.GetComponent<SpriteRenderer>().color = new Color(0, 0, 0, damagePercent * 2);
-        if (damagePercent > 100)
-        {
-            //gameOver
-        }
+        deadScreen.SetActive(true);
+        depthcnt.text = Mathf.FloorToInt(MaxDepth).ToString()+"m";
+        mappedCellscnt.text = ptm.countPlayerScore(dm.drawnCells)[0].ToString()+" Units";
+        accuracycnt.text = Mathf.Floor(((float)ptm.countPlayerScore(dm.drawnCells)[1] / (float)ptm.countPlayerScore(dm.drawnCells)[0]) * 100).ToString() + "%";
+        Time.timeScale = 0;
+
     }
     private void FixedUpdate()
     {
@@ -86,10 +104,11 @@ public class PlayerController : MonoBehaviour
 
         while (true)
         {
+            damageDisplay.GetComponent<SpriteRenderer>().color = new Color(0, 0, 0, damagePercent * 2);
             if (damagePercent > 0)
             {
                 damagePercent--;
-                yield return new WaitForSeconds(0.1f);
+                yield return new WaitForSeconds(0.2f);
             }
             yield return null;
         }

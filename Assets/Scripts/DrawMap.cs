@@ -5,7 +5,7 @@ using UnityEngine.Tilemaps;
 
 public class DrawMap : MonoBehaviour
 {
-    List<Vector3> drawnCells = new List<Vector3>();
+    public List<Vector3> drawnCells = new List<Vector3>();
     List<Vector3> workingMap = new List<Vector3>();
     public Tilemap PTM;
     public Tile Wall;
@@ -108,14 +108,21 @@ public class DrawMap : MonoBehaviour
             {
                 foreach (Vector3 wmap in workingMap)
                 {
-                    drawnCells.Add(wmap);
+                    if (!drawnCells.Contains(wmap))
+                    {
+                        drawnCells.Add(wmap);
+                    }
+                    
                 }
             }
             if (delete)
             {
                 foreach (Vector3 wmap in workingMap)
                 {
-                    drawnCells.Remove(wmap);
+                    if (drawnCells.Contains(wmap))
+                    {
+                        drawnCells.Remove(wmap);
+                    }
                 }
             }
             workingMap.Clear();
